@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMS Documentation Hub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transition: box-shadow 0.3s;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+        }
+
+        .tiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .tile {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .tile:hover::before {
+            transform: scaleX(1);
+        }
+
+        .tile-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .tile-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .tile-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            flex: 1;
+            margin-bottom: 15px;
+        }
+
+        .tile-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 13px;
+            color: #999;
+        }
+
+        .tile-badge {
+            background: #e8f4f8;
+            color: #3498db;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .tile.coming-soon {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .tile.coming-soon::after {
+            content: 'Coming Soon';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f39c12;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .tile.coming-soon:hover {
+            transform: none;
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            padding: 60px 20px;
+            font-size: 18px;
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>TMS Documentation Hub</h1>
+            <div class="subtitle">Interactive Q&A for Suncorp Migration Service</div>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search features...">
+        </div>
+
+        <div class="tiles-grid" id="tilesGrid"></div>
+        <div class="no-results" id="noResults">No features found matching your search.</div>
+
+        <footer>
+            <p>TMS Suncorp Application • Interactive Documentation</p>
+        </footer>
+    </div>
+
+    <script>
+        const features = [
+            {
+                title: "Customer Profile Creation",
+                description: "Learn how the Customer Profile Creation Phase works, including scheduler behavior, payload handling, asynchronous data arrival, and event tracking.",
+                icon: "👤",
+                link: "customer-profile.html",
+                questionCount: 18,
+                tags: ["Phase Workflow", "OCV", "Scheduler"],
+                status: "available"
+            },
+            {
+                title: "Account Number Allocation",
+                description: "Understand the Account Number Allocation Phase, ANGI integration, preallocated numbers, and status maintenance workflows.",
+                icon: "🔢",
+                link: "account-number-allocation.html",
+                questionCount: 0,
+                tags: ["Phase Workflow", "ANGI", "CAP"],
+                status: "coming-soon"
+            },
+            {
+                title: "Migration Indicator",
+                description: "Explore migration indicator maintenance for profiles and accounts, status updates, and CAP-CIS integration patterns.",
+                icon: "🔄",
+                link: "migration-indicator.html",
+                questionCount: 0,
+                tags: ["Phase Workflow", "CAP-CIS"],
+                status: "coming-soon"
+            },
+            {
+                title: "File Ingestion",
+                description: "Deep dive into file ingestion workflows, GCS integration, tag file handling, and payload generation from source files.",
+                icon: "📂",
+                link: "file-ingestion.html",
+                questionCount: 0,
+                tags: ["Workflow", "GCS", "EventMesh"],
+                status: "coming-soon"
+            },
+            {
+                title: "Scheduler Patterns",
+                description: "Master scheduler architecture, base scheduler patterns, rate limiting, checkpoints, and phase orchestration.",
+                icon: "⏰",
+                link: "scheduler-patterns.html",
+                questionCount: 0,
+                tags: ["Scheduler", "Temporal", "Architecture"],
+                status: "coming-soon"
+            },
+            {
+                title: "Testing Best Practices",
+                description: "Comprehensive guide to blackbox testing, FlimFlam mocks, Spanner expectations, event verification, and test isolation.",
+                icon: "🧪",
+                link: "testing-practices.html",
+                questionCount: 0,
+                tags: ["Testing", "FlimFlam", "Ginkgo"],
+                status: "coming-soon"
+            }
+        ];
+
+        function renderTiles(filteredFeatures = features) {
+            const grid = document.getElementById('tilesGrid');
+            const noResults = document.getElementById('noResults');
+
+            if (filteredFeatures.length === 0) {
+                grid.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            noResults.style.display = 'none';
+
+            grid.innerHTML = filteredFeatures.map(feature => {
+                const isComingSoon = feature.status === 'coming-soon';
+                const tileClass = isComingSoon ? 'tile coming-soon' : 'tile';
+                const tileTag = isComingSoon ? 'a' : 'a';
+                const onClick = isComingSoon ? 'onclick="return false;"' : '';
+
+                return `
+                    <${tileTag} href="${feature.link}" class="${tileClass}" ${onClick}>
+                        <div class="tile-icon">${feature.icon}</div>
+                        <div class="tile-title">${feature.title}</div>
+                        <div class="tile-description">${feature.description}</div>
+                        <div class="tile-meta">
+                            ${feature.questionCount > 0
+                                ? `<span>${feature.questionCount} questions</span>`
+                                : '<span>-</span>'}
+                            <span class="tile-badge">${feature.tags[0]}</span>
+                        </div>
+                    </${tileTag}>
+                `;
+            }).join('');
+        }
+
+        function searchFeatures() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            if (!searchTerm) {
+                renderTiles(features);
+                return;
+            }
+
+            const filtered = features.filter(feature =>
+                feature.title.toLowerCase().includes(searchTerm) ||
+                feature.description.toLowerCase().includes(searchTerm) ||
+                feature.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+            );
+
+            renderTiles(filtered);
+        }
+
+        // Initialize
+        renderTiles();
+
+        // Search with debounce
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(searchFeatures, 300);
+        });
+    </script>
+</body>
+</html>

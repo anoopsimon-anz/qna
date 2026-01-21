@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMS Feature Q&A</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            background: #fafafa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .search-box {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 13px;
+            color: #999;
+        }
+
+        .feature-section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .feature-title {
+            font-size: 22px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .overview {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+
+        .overview h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .overview p {
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .qna-item {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+        }
+
+        .qna-item:last-child {
+            border-bottom: none;
+        }
+
+        .question {
+            cursor: pointer;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .question:hover {
+            background: #e9ecef;
+        }
+
+        .question-text {
+            font-weight: 500;
+            color: #2c3e50;
+            flex: 1;
+        }
+
+        .toggle-icon {
+            font-size: 18px;
+            color: #666;
+            transition: transform 0.3s;
+            margin-left: 10px;
+        }
+
+        .toggle-icon.open {
+            transform: rotate(180deg);
+        }
+
+        .answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 15px;
+        }
+
+        .answer.show {
+            max-height: 2000px;
+            padding: 15px;
+        }
+
+        .answer-content {
+            color: #555;
+        }
+
+        .answer-content code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .answer-content pre {
+            background: #f4f4f4;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .answer-content ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .answer-content li {
+            margin-bottom: 5px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            display: none;
+        }
+
+        .stats {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>TMS Feature Documentation</h1>
+            <div class="subtitle">Interactive Q&A for Suncorp Migration Service</div>
+        </header>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search questions and answers...">
+            <span class="search-icon">🔍</span>
+        </div>
+
+        <div id="content"></div>
+        <div class="no-results" id="noResults">No results found. Try different keywords.</div>
+    </div>
+
+    <script>
+        const features = [
+            {
+                title: "Customer Profile Creation Phase",
+                overview: {
+                    title: "Overview - From a Tester's Perspective",
+                    content: [
+                        "The Customer Profile Creation Phase is a Temporal workflow that orchestrates creating customer profiles in the OCV system.",
+                        "It executes three sequential activities: OCVOnboarding → MaintainParty (Migration Indicator) → MaintainRelationship.",
+                        "The phase is triggered by a scheduler that monitors database payloads and starts workflows when data arrives.",
+                        "Key testing focus: Payload setup, event tracking, asynchronous data arrival, and activity execution order."
+                    ]
+                },
+                qna: [
+                    {
+                        question: "What is the Customer Profile Creation Phase?",
+                        answer: "A Temporal workflow that creates customer profiles in OCV by executing three sequential activities:<br><br>1. <code>OCVCustomerOnboarding</code> - Creates initial profile (returns OCVID and CAP CIS ID)<br>2. <code>OCVMaintainPartyMigrationIndicator</code> - Updates party with migration data<br>3. <code>OCVMaintainRelationship</code> - Establishes customer relationships<br><br>Each activity processes payloads from the database for a specific <code>CustomerGroupID</code>."
+                    },
+                    {
+                        question: "How does the phase start?",
+                        answer: "The phase is started by the <strong>Customer Profile Scheduler</strong>:<br><br>1. Scheduler runs periodically (configurable frequency)<br>2. Queries database for payloads with:<br>&nbsp;&nbsp;&nbsp;• InterfaceName = <code>OCVOnboarding</code><br>&nbsp;&nbsp;&nbsp;• Status = <code>Schedulable</code><br>3. Groups payloads by <code>CustomerGroupID</code><br>4. Updates payload status to <code>Scheduled</code><br>5. Starts child workflow <code>RunCreateProfileWorkflow</code> for each group"
+                    },
+                    {
+                        question: "Which interface does the scheduler check before starting the phase?",
+                        answer: "The scheduler ONLY checks for <code>OCVOnboarding</code> payloads.<br><br>It does NOT verify that MaintainParty or Relationship payloads exist before starting the workflow. This is intentional - it allows for asynchronous payload arrival."
+                    },
+                    {
+                        question: "What happens if MaintainParty or Relationship payloads are missing?",
+                        answer: "The workflow does NOT fail - it enters a <strong>holding pattern</strong>:<br><br>1. Phase starts (OCVOnboarding exists)<br>2. OCVOnboarding activity completes successfully<br>3. Tries to fetch MaintainParty payloads → NOT FOUND<br>4. Activity retries with exponential backoff:<br>&nbsp;&nbsp;&nbsp;• 1s → 3s → 9s → 27s → 81s → 300s (max)<br>5. Workflow waits indefinitely until payloads arrive<br><br>This is a <strong>business requirement</strong> to support asynchronous data arrival from different upstream systems."
+                    },
+                    {
+                        question: "Why is the retry-forever pattern intentional?",
+                        answer: "It's designed for <strong>asynchronous data orchestration</strong>:<br><br><strong>Real-world scenario:</strong><br>• ADMP sends OCVOnboarding payload at T0<br>• Phase starts immediately<br>• MaintainParty payload arrives 5 minutes later from another system<br>• Relationship payload arrives 2 minutes after that<br><br><strong>Benefits:</strong><br>✅ No external coordination needed<br>✅ Temporal handles retry logic<br>✅ Workflow automatically resumes when data arrives<br>✅ Supports different data arrival patterns"
+                    },
+                    {
+                        question: "How many payloads are required for the phase?",
+                        answer: "Minimum <strong>three payloads</strong> with the same <code>CustomerGroupID</code>:<br><br>1. OCVOnboarding (triggers scheduler)<br>2. OCVMaintainPartyMigrationIndicator<br>3. OCVMaintainRelationship<br><br><strong>Important:</strong> All must share the same <code>CustomerGroupID</code> to be processed in one workflow execution."
+                    },
+                    {
+                        question: "What are payload replacements and why are they needed?",
+                        answer: "Payload replacements pass data from one activity to subsequent activities:<br><br><strong>Example flow:</strong><br>1. OCVOnboarding returns: <code>OCVID</code> and <code>CapCisID</code><br>2. These values are extracted and stored in a map: <code>miReplacements[customerID] = {OcvID, CapCisID}</code><br>3. MaintainParty activity uses these values to replace placeholders in its request payload<br><br><strong>Why?</strong> Because downstream APIs need IDs generated by upstream activities."
+                    },
+                    {
+                        question: "Can different customers appear in different activity payloads?",
+                        answer: "<strong>Yes, BUT...</strong> there's a design consideration:<br><br><strong>Current behavior:</strong> If a customer appears in MaintainParty but NOT in OCVOnboarding, the activity executes with a <code>nil</code> template (no replacements). This likely causes a 4xx error from the OCV API.<br><br><strong>Expected design:</strong> All customers should go through OCVOnboarding first since subsequent activities need the OCVID/CapCisID from onboarding results.<br><br><strong>Test scenario:</strong> You can test incremental customer arrival, but ensure all customers have onboarding data."
+                    },
+                    {
+                        question: "How does phase started eventing work?",
+                        answer: "Phase started events are published <strong>incrementally</strong> whenever new customers enter the phase:<br><br>1. Each activity calls <code>RetrievePayloadIDsAndTriggerDispatcherActivity</code><br>2. This extracts all customer IDs from payloads<br>3. Calls <code>PublishStartedEvent(customerIDs)</code><br>4. The system filters to only customers who haven't received the event yet<br>5. Publishes event for new customers only<br>6. Records in workflow state to prevent duplicates"
+                    },
+                    {
+                        question: "What's the difference between phase started and phase completed events?",
+                        answer: "<strong>Phase Started Events (Incremental):</strong><br>• Published multiple times during workflow execution<br>• Each event contains ONLY newly discovered customers<br>• Example: Event 1: [cust-123], Event 2: [cust-456]<br><br><strong>Phase Completed Event (Consolidated):</strong><br>• Published ONCE at the end<br>• Contains ALL customers who went through the phase<br>• Example: Event: [cust-123, cust-456]<br><br><strong>Testing:</strong> Verify LAST started event for new customers, completed event for all customers."
+                    },
+                    {
+                        question: "How do I test that new customers added mid-phase get events?",
+                        answer: "<strong>Test setup:</strong><br>1. Create 1 payload for OCVOnboarding (customer A)<br>2. Create 1 payload for MaintainParty (customer A)<br>3. Create 2 payloads for Relationship (customer A + B) ← New customer here<br><br><strong>Expected behavior:</strong><br>• OCVOnboarding runs → Event published for [A]<br>• MaintainParty runs → No new event (A already has it)<br>• Relationship runs → Event published for [B] only<br>• Phase completes → Completed event for [A, B]<br><br><strong>Assertion:</strong> Verify LAST phase started event contains only [B]."
+                    },
+                    {
+                        question: "What FlimFlam expectations are needed for testing?",
+                        answer: "Set expectations matching the number of API calls:<br><br><code>Iat.FlimFlam.SetExpectations(<br>&nbsp;&nbsp;// 1 OCVOnboarding payload = 1 call<br>&nbsp;&nbsp;expectations.SuccessfulOcvCustomerOnboardingExpectation(...),<br>&nbsp;&nbsp;// 1 MaintainParty payload = 1 call<br>&nbsp;&nbsp;expectations.SuccessfulOcvMaintainPartyExpectation(...),<br>&nbsp;&nbsp;// 2 Relationship payloads = 2 calls<br>&nbsp;&nbsp;expectations.SuccessfulOcvMaintainPartyRelationshipExpectation(),<br>&nbsp;&nbsp;expectations.SuccessfulOcvMaintainPartyRelationshipExpectation(),<br>)</code><br><br>Each expectation defaults to <code>.Count(1)</code>, so duplicate for multiple calls."
+                    },
+                    {
+                        question: "Why did verifyEventContainsCustomers fail initially?",
+                        answer: "The function was checking the FIRST event instead of the LAST:<br><br><strong>Problem:</strong> When multiple phase started events exist, it grabbed the first one which only had the initial customer.<br><br><strong>Fix:</strong> Iterate backwards through events to get the most recent:<br><br><code>for i := len(events) - 1; i >= 0; i-- {<br>&nbsp;&nbsp;if events[i].EventType == eventType {<br>&nbsp;&nbsp;&nbsp;&nbsp;// Use this event (most recent)<br>&nbsp;&nbsp;}<br>}</code><br><br>This ensures you verify against the latest customer list."
+                    },
+                    {
+                        question: "What cleanup is needed before running the test?",
+                        answer: "Clean up stale payloads from previous test runs:<br><br><code>cleanupPayloadsByInterfaceAndStatuses(ctx,<br>&nbsp;&nbsp;globalConstants.OCVOnboardingInterfaceName,<br>&nbsp;&nbsp;[]string{<br>&nbsp;&nbsp;&nbsp;&nbsp;globalConstants.Schedulable.String(),<br>&nbsp;&nbsp;&nbsp;&nbsp;globalConstants.Scheduled.String(),<br>&nbsp;&nbsp;&nbsp;&nbsp;globalConstants.Processing.String(),<br>&nbsp;&nbsp;}<br>)</code><br><br>Repeat for all three interface names to ensure test isolation."
+                    },
+                    {
+                        question: "What are the key files for this phase?",
+                        answer: "<strong>Phase Implementation:</strong><br>• <code>modules/orchestrators/worker/workflows/phases/createprofile/createcustomerprofile.go</code><br><br><strong>Scheduler:</strong><br>• <code>modules/orchestrators/worker/workflows/schedulers/createprofile/scheduler.go</code><br><br><strong>Payload Logic:</strong><br>• <code>modules/orchestrators/worker/pkg/payload/payload.go</code><br><br><strong>Event Logic:</strong><br>• <code>modules/orchestrators/worker/pkg/phase/phase.go</code><br>• <code>modules/pkg/types/state.go</code><br><br><strong>Tests:</strong><br>• <code>test-harness/suites/blackbox/phaseworkflow_customercreation_test.go</code>"
+                    },
+                    {
+                        question: "What's the workflow execution order?",
+                        answer: "<strong>Temporal Workflow Lifecycle:</strong><br><br>1. <code>phaseStart</code> - Initialize dispatcher, track checkpoint<br>2. <code>InitializeState</code> - Set GroupID<br>3. <code>SetupQueryHandlers</code> - Enable state queries<br>4. <code>RunWorkflow</code> - Execute activities:<br>&nbsp;&nbsp;&nbsp;• OCVOnboarding (wait for completion)<br>&nbsp;&nbsp;&nbsp;• Build payload replacements<br>&nbsp;&nbsp;&nbsp;• MaintainParty (with replacements)<br>&nbsp;&nbsp;&nbsp;• MaintainRelationship<br>5. <code>phaseEnd</code> - Publish completed event, mark checkpoint"
+                    },
+                    {
+                        question: "How do I debug a stuck workflow?",
+                        answer: "<strong>Check Temporal UI (http://localhost:8088):</strong><br>1. Find your workflow by ID<br>2. Check workflow history - what's the last event?<br>3. Look for pending activities<br>4. Check activity retry count<br><br><strong>Common issues:</strong><br>• Missing payloads → Activity retrying forever<br>• FlimFlam expectation mismatch → 500 errors<br>• Channel buffering → Workflow waiting for outputs<br><br><strong>Worker logs:</strong><br><code>docker logs devstack-component_worker-1 --tail 200</code>"
+                    },
+                    {
+                        question: "What's the scheduler checkpoint table for?",
+                        answer: "<strong>Purpose:</strong> Tracks phase execution progress for monitoring and debugging.<br><br><strong>Data stored:</strong><br>• GroupID<br>• PhaseName<br>• CustomerIDs (updated incrementally)<br>• Status (Started → Completed/Failed)<br>• Timestamps<br><br><strong>Testing:</strong> Use <code>AssertSchedulerCheckpointTableByCustomerGroupID</code> to verify all customers are tracked, even those added mid-phase."
+                    }
+                ]
+            }
+        ];
+
+        function renderContent(filteredFeatures = features) {
+            const content = document.getElementById('content');
+            const noResults = document.getElementById('noResults');
+
+            if (filteredFeatures.length === 0 || filteredFeatures.every(f => f.qna.length === 0)) {
+                content.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            noResults.style.display = 'none';
+
+            content.innerHTML = filteredFeatures.map(feature => `
+                <div class="feature-section">
+                    <h2 class="feature-title">${feature.title}</h2>
+
+                    ${feature.overview ? `
+                        <div class="overview">
+                            <h3>${feature.overview.title}</h3>
+                            ${feature.overview.content.map(p => `<p>${p}</p>`).join('')}
+                        </div>
+                    ` : ''}
+
+                    ${feature.qna.map((item, idx) => `
+                        <div class="qna-item" data-feature="${feature.title}" data-index="${idx}">
+                            <div class="question" onclick="toggleAnswer(this)">
+                                <span class="question-text">${item.question}</span>
+                                <span class="toggle-icon">▼</span>
+                            </div>
+                            <div class="answer">
+                                <div class="answer-content">${item.answer}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+
+                    <div class="stats">
+                        ${feature.qna.length} question${feature.qna.length !== 1 ? 's' : ''} available
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleAnswer(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('.toggle-icon');
+
+            answer.classList.toggle('show');
+            icon.classList.toggle('open');
+        }
+
+        function searchQnA() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            if (!searchTerm) {
+                renderContent(features);
+                return;
+            }
+
+            const filtered = features.map(feature => ({
+                ...feature,
+                qna: feature.qna.filter(item =>
+                    item.question.toLowerCase().includes(searchTerm) ||
+                    item.answer.toLowerCase().includes(searchTerm)
+                )
+            })).filter(feature => feature.qna.length > 0);
+
+            renderContent(filtered);
+        }
+
+        // Initialize
+        renderContent();
+
+        // Search with debounce
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(searchQnA, 300);
+        });
+    </script>
+</body>
+</html>
