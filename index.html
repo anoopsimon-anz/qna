@@ -8,10 +8,10 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
+            font-family: Roboto, 'Segoe UI', system-ui, sans-serif;
+            background: #f5f5f5;
+            color: #212121;
+            padding: 24px;
         }
 
         .container {
@@ -20,160 +20,139 @@
         }
 
         header {
-            text-align: center;
-            color: white;
-            margin-bottom: 50px;
+            margin-bottom: 32px;
         }
 
         h1 {
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-size: 28px;
+            font-weight: 400;
+            color: #212121;
+            margin-bottom: 4px;
         }
 
         .subtitle {
-            font-size: 18px;
-            opacity: 0.95;
-            font-weight: 300;
+            font-size: 14px;
+            color: #757575;
         }
 
         .search-container {
-            max-width: 600px;
-            margin: 0 auto 40px;
+            margin-bottom: 24px;
         }
 
         #searchInput {
             width: 100%;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 50px;
-            font-size: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            transition: box-shadow 0.3s;
+            max-width: 600px;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
         }
 
         #searchInput:focus {
             outline: none;
-            box-shadow: 0 6px 30px rgba(0,0,0,0.25);
+            border-color: #1976d2;
         }
 
         .tiles-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            gap: 16px;
         }
 
         .tile {
             background: white;
-            border-radius: 12px;
-            padding: 30px;
+            border-radius: 4px;
+            padding: 24px;
             text-decoration: none;
             color: inherit;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
             display: flex;
             flex-direction: column;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tile::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            transform: scaleX(0);
-            transition: transform 0.3s;
+            transition: box-shadow 0.2s;
         }
 
         .tile:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        .tile:hover::before {
-            transform: scaleX(1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.16);
         }
 
         .tile-icon {
-            font-size: 40px;
-            margin-bottom: 15px;
+            font-size: 32px;
+            margin-bottom: 12px;
         }
 
         .tile-title {
-            font-size: 22px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #212121;
+            margin-bottom: 8px;
         }
 
         .tile-description {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.6;
+            font-size: 13px;
+            color: #757575;
+            line-height: 1.5;
             flex: 1;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
 
         .tile-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-            font-size: 13px;
-            color: #999;
+            padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #9e9e9e;
         }
 
         .tile-badge {
-            background: #e8f4f8;
-            color: #3498db;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: 500;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 2px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .tile.coming-soon {
-            opacity: 0.6;
-            cursor: not-allowed;
+            opacity: 0.5;
+            cursor: default;
+            position: relative;
         }
 
         .tile.coming-soon::after {
-            content: 'Coming Soon';
+            content: 'COMING SOON';
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #f39c12;
+            top: 12px;
+            right: 12px;
+            background: #ff9800;
             color: white;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 2px;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         .tile.coming-soon:hover {
-            transform: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
         }
 
         .no-results {
             text-align: center;
-            color: white;
-            padding: 60px 20px;
-            font-size: 18px;
+            color: #9e9e9e;
+            padding: 48px 20px;
+            font-size: 14px;
             display: none;
         }
 
         footer {
             text-align: center;
-            color: white;
-            margin-top: 60px;
-            opacity: 0.9;
-            font-size: 14px;
+            color: #9e9e9e;
+            margin-top: 48px;
+            font-size: 12px;
         }
     </style>
 </head>
