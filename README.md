@@ -2,127 +2,103 @@
 
 Interactive documentation hub for TMS Suncorp features in question-answer format.
 
-## Project Structure
+**View Published Docs**: https://anoopsimon-anz.github.io/qna/
 
-```
-qna/
-├── index.html                    # Landing page with feature tiles
-├── customer-profile.html         # Customer Profile Creation Q&A
-├── account-number-allocation.html (coming soon)
-├── migration-indicator.html      (coming soon)
-└── README.md                     # This file
-```
+---
 
-## How to Use
+## Updating Documentation via AI
 
-1. Open `index.html` in your browser
-2. Click on any feature tile to access its Q&A page
-3. Use search bars to filter content
-4. Click questions to expand/collapse answers
+Use the reusable prompt template in **[UPDATE_PROMPT.md](./UPDATE_PROMPT.md)** to have Claude update the documentation for you.
 
-## Adding a New Feature Page
+**Quick workflow:**
 
-### Step 1: Create the HTML file
+1. Copy the prompt from UPDATE_PROMPT.md
+2. Paste to Claude and provide context (conversation transcript, feature details, etc.)
+3. Claude will update the appropriate HTML files
 
-Copy `customer-profile.html` as a template:
+See UPDATE_PROMPT.md for detailed examples and scenarios.
 
-```bash
-cp customer-profile.html your-feature.html
-```
+---
 
-### Step 2: Update the features array
+## Manual Updates
 
-Edit your new HTML file's JavaScript `features` array:
+### Feature Page Structure (customer-profile.html)
+
+Each feature page has a JavaScript array with this structure:
 
 ```javascript
 const features = [
     {
-        title: "Your Feature Name",
+        title: "Customer Profile Creation",
         overview: {
             title: "Overview - From a Tester's Perspective",
             content: [
-                "First paragraph about the feature",
+                "First paragraph explaining the feature",
                 "Second paragraph with key points",
-                "Testing focus areas"
+                "Testing-relevant information"
             ]
         },
         qna: [
             {
-                question: "What is this feature?",
-                answer: "Your detailed answer with HTML formatting..."
+                question: "What is the Customer Profile Creation Phase?",
+                answer: `
+                    The Customer Profile Creation Phase is a <strong>Temporal workflow</strong>...
+                    <br><br>
+                    Use HTML formatting:
+                    <ul>
+                        <li><code>inline code</code> for technical terms</li>
+                        <li><strong>bold</strong> for emphasis</li>
+                        <li><pre>code blocks</pre> for examples</li>
+                    </ul>
+                `
             }
         ]
     }
 ];
 ```
 
-### Step 3: Add to index page
+### Landing Page Structure (index.html)
 
-Edit `index.html` and add to the `features` array:
+Add new feature tiles to the `features` array:
 
 ```javascript
-{
-    title: "Your Feature Name",
-    description: "Brief description for the tile",
-    icon: "🎯", // Pick an emoji
-    link: "your-feature.html",
-    questionCount: 15, // Update after adding questions
-    tags: ["Tag1", "Tag2"],
-    status: "available" // or "coming-soon"
-}
+const features = [
+    {
+        title: "Your Feature Name",
+        description: "Brief description shown on the tile",
+        icon: "🎯",  // Pick an emoji
+        link: "your-feature.html",
+        questionCount: 15,  // Update after adding questions
+        tags: ["Phase Workflow", "Tag2"],
+        status: "available"  // or "coming-soon"
+    }
+];
 ```
 
-## Answer Formatting Tips
+### HTML Formatting in Answers
 
-### Inline code
-```html
-<code>CustomerGroupID</code>
+- **Inline code**: `<code>CustomerGroupID</code>`
+- **Code blocks**: `<pre>SELECT * FROM Table</pre>`
+- **Bold**: `<strong>important text</strong>`
+- **Line breaks**: `<br>` or `<br><br>` for paragraphs
+- **Lists**: `<ul><li>item</li></ul>`
+
+### Steps to Add a New Feature
+
+1. Copy `customer-profile.html` to `your-feature.html`
+2. Update the `features` array in your new file
+3. Add entry to `index.html` features array
+4. Update `questionCount` in index.html
+5. Test by opening index.html in browser
+
+---
+
+## Project Structure
+
 ```
-
-### Code blocks
-```html
-<pre>
-SELECT * FROM Payloads
-WHERE InterfaceName = 'OCVOnboarding'
-</pre>
-```
-
-### Lists
-```html
-<ul>
-  <li>First item</li>
-  <li>Second item</li>
-</ul>
-```
-
-### Formatting
-- `<strong>` for bold
-- `<br>` for line breaks
-- `&nbsp;` for spacing
-- `<code>` for inline code
-
-## Current Features
-
-### Available
-- ✅ **Customer Profile Creation** (18 questions)
-  - Phase workflow execution
-  - Scheduler behavior
-  - Event tracking
-  - Testing patterns
-
-### Coming Soon
-- ⏳ Account Number Allocation
-- ⏳ Migration Indicator
-- ⏳ File Ingestion
-- ⏳ Scheduler Patterns
-- ⏳ Testing Best Practices
-
-## Quick Start
-
-```bash
-# Open the documentation hub
-open index.html
-
-# Or directly open a feature
-open customer-profile.html
+qna/
+├── index.html                    # Landing page with feature tiles
+├── customer-profile.html         # Customer Profile Creation Q&A
+├── UPDATE_PROMPT.md              # AI update template
+└── README.md                     # This file
 ```
