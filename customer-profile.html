@@ -289,28 +289,16 @@
                         answer: "Set expectations matching the number of API calls:<br><br><code>Iat.FlimFlam.SetExpectations(<br>&nbsp;&nbsp;// 1 OCVOnboarding payload = 1 call<br>&nbsp;&nbsp;expectations.SuccessfulOcvCustomerOnboardingExpectation(...),<br>&nbsp;&nbsp;// 1 MaintainParty payload = 1 call<br>&nbsp;&nbsp;expectations.SuccessfulOcvMaintainPartyExpectation(...),<br>&nbsp;&nbsp;// 2 Relationship payloads = 2 calls<br>&nbsp;&nbsp;expectations.SuccessfulOcvMaintainPartyRelationshipExpectation(),<br>&nbsp;&nbsp;expectations.SuccessfulOcvMaintainPartyRelationshipExpectation(),<br>)</code><br><br>Each expectation defaults to <code>.Count(1)</code>, so duplicate for multiple calls."
                     },
                     {
-                        question: "Why did verifyEventContainsCustomers fail initially?",
-                        answer: "The function was checking the FIRST event instead of the LAST:<br><br><strong>Problem:</strong> When multiple phase started events exist, it grabbed the first one which only had the initial customer.<br><br><strong>Fix:</strong> Iterate backwards through events to get the most recent:<br><br><code>for i := len(events) - 1; i >= 0; i-- {<br>&nbsp;&nbsp;if events[i].EventType == eventType {<br>&nbsp;&nbsp;&nbsp;&nbsp;// Use this event (most recent)<br>&nbsp;&nbsp;}<br>}</code><br><br>This ensures you verify against the latest customer list."
-                    },
-                    {
                         question: "What cleanup is needed before running the test?",
                         answer: "Clean up stale payloads from previous test runs:<br><br><code>cleanupPayloadsByInterfaceAndStatuses(ctx,<br>&nbsp;&nbsp;globalConstants.OCVOnboardingInterfaceName,<br>&nbsp;&nbsp;[]string{<br>&nbsp;&nbsp;&nbsp;&nbsp;globalConstants.Schedulable.String(),<br>&nbsp;&nbsp;&nbsp;&nbsp;globalConstants.Scheduled.String(),<br>&nbsp;&nbsp;&nbsp;&nbsp;globalConstants.Processing.String(),<br>&nbsp;&nbsp;}<br>)</code><br><br>Repeat for all three interface names to ensure test isolation."
-                    },
-                    {
-                        question: "What are the key files for this phase?",
-                        answer: "<strong>Phase Implementation:</strong><br>• <code>modules/orchestrators/worker/workflows/phases/createprofile/createcustomerprofile.go</code><br><br><strong>Scheduler:</strong><br>• <code>modules/orchestrators/worker/workflows/schedulers/createprofile/scheduler.go</code><br><br><strong>Payload Logic:</strong><br>• <code>modules/orchestrators/worker/pkg/payload/payload.go</code><br><br><strong>Event Logic:</strong><br>• <code>modules/orchestrators/worker/pkg/phase/phase.go</code><br>• <code>modules/pkg/types/state.go</code><br><br><strong>Tests:</strong><br>• <code>test-harness/suites/blackbox/phaseworkflow_customercreation_test.go</code>"
                     },
                     {
                         question: "What's the workflow execution order?",
                         answer: "<strong>Temporal Workflow Lifecycle:</strong><br><br>1. <code>phaseStart</code> - Initialize dispatcher, track checkpoint<br>2. <code>InitializeState</code> - Set GroupID<br>3. <code>SetupQueryHandlers</code> - Enable state queries<br>4. <code>RunWorkflow</code> - Execute activities:<br>&nbsp;&nbsp;&nbsp;• OCVOnboarding (wait for completion)<br>&nbsp;&nbsp;&nbsp;• Build payload replacements<br>&nbsp;&nbsp;&nbsp;• MaintainParty (with replacements)<br>&nbsp;&nbsp;&nbsp;• MaintainRelationship<br>5. <code>phaseEnd</code> - Publish completed event, mark checkpoint"
                     },
                     {
-                        question: "How do I debug a stuck workflow?",
-                        answer: "<strong>Check Temporal UI (http://localhost:8088):</strong><br>1. Find your workflow by ID<br>2. Check workflow history - what's the last event?<br>3. Look for pending activities<br>4. Check activity retry count<br><br><strong>Common issues:</strong><br>• Missing payloads → Activity retrying forever<br>• FlimFlam expectation mismatch → 500 errors<br>• Channel buffering → Workflow waiting for outputs<br><br><strong>Worker logs:</strong><br><code>docker logs devstack-component_worker-1 --tail 200</code>"
-                    },
-                    {
                         question: "What's the scheduler checkpoint table for?",
-                        answer: "<strong>Purpose:</strong> Tracks phase execution progress for monitoring and debugging.<br><br><strong>Data stored:</strong><br>• GroupID<br>• PhaseName<br>• CustomerIDs (updated incrementally)<br>• Status (Started → Completed/Failed)<br>• Timestamps<br><br><strong>Testing:</strong> Use <code>AssertSchedulerCheckpointTableByCustomerGroupID</code> to verify all customers are tracked, even those added mid-phase."
+                        answer: "<strong>Purpose:</strong> Tracks phase execution progress for monitoring and testing.<br><br><strong>Data stored:</strong><br>• GroupID<br>• PhaseName<br>• CustomerIDs (updated incrementally)<br>• Status (Started → Completed/Failed)<br>• Timestamps<br><br><strong>Testing:</strong> Use <code>AssertSchedulerCheckpointTableByCustomerGroupID</code> to verify all customers are tracked, even those added mid-phase."
                     }
                 ]
             }

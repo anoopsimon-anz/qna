@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testing Best Practices - TMS Q&A</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Roboto, 'Segoe UI', system-ui, sans-serif;
+            background: #f5f5f5;
+            color: #212121;
+            padding: 24px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #1976d2;
+            text-decoration: none;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        header {
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 400;
+            color: #212121;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #757575;
+        }
+
+        .search-container {
+            margin-bottom: 24px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: #1976d2;
+        }
+
+        .overview {
+            background: white;
+            border-radius: 4px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+
+        .overview h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: #212121;
+            margin-bottom: 16px;
+        }
+
+        .overview p {
+            color: #424242;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .qna-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .qna-item {
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            transition: box-shadow 0.2s;
+        }
+
+        .qna-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.16);
+        }
+
+        .question {
+            padding: 16px 20px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            color: #212121;
+            font-size: 14px;
+        }
+
+        .question:hover {
+            background: #fafafa;
+        }
+
+        .toggle-icon {
+            color: #757575;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .qna-item.open .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            color: #424242;
+            font-size: 14px;
+            border-top: 1px solid transparent;
+        }
+
+        .qna-item.open .answer {
+            max-height: 2000px;
+            padding: 16px 20px 20px 20px;
+            border-top-color: #e0e0e0;
+        }
+
+        .answer code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            color: #c62828;
+        }
+
+        .answer pre {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 12px 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            border-left: 3px solid #1976d2;
+        }
+
+        .answer ul, .answer ol {
+            margin: 12px 0;
+            padding-left: 24px;
+        }
+
+        .answer li {
+            margin: 6px 0;
+        }
+
+        .answer strong {
+            color: #212121;
+            font-weight: 500;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #9e9e9e;
+            padding: 48px 20px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            color: #9e9e9e;
+            margin-top: 48px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Documentation Hub</a>
+
+        <header>
+            <h1>Testing Best Practices</h1>
+            <div class="subtitle">Blackbox testing, FlimFlam mocks, Spanner expectations, and test isolation</div>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search questions...">
+        </div>
+
+        <div id="content"></div>
+        <div class="no-results" id="noResults">No questions found matching your search.</div>
+
+        <footer>
+            <p>TMS Suncorp Application • Interactive Documentation</p>
+        </footer>
+    </div>
+
+    <script>
+        const features = [
+            {
+                title: "Testing Best Practices",
+                overview: {
+                    title: "Overview - From a Tester's Perspective",
+                    content: [
+                        "Blackbox tests in TMS validate end-to-end workflow behavior without knowledge of internal implementation. These integration tests run against a local devstack environment with real Temporal workflows, Spanner database, and FlimFlam mock server.",
+                        "The test suite uses Ginkgo as the testing framework and Gomega for assertions. FlimFlam provides configurable HTTP mocks for downstream services (OCV, ANGI, CAP-CIS), while Spanner expectations validate database state. Event verification ensures workflows publish correct events to EventMesh.",
+                        "Key testing principles: Test isolation (clean database state between runs), realistic scenarios (async payload arrival), explicit expectations (FlimFlam call counts), and last-event verification (for incremental events)."
+                    ]
+                },
+                qna: [
+                    {
+                        question: "What are blackbox tests in TMS?",
+                        answer: `
+                            Blackbox tests are <strong>integration tests</strong> that validate TMS workflows end-to-end without knowledge of internal implementation details.
+                            <br><br>
+                            <strong>Key characteristics:</strong>
+                            <ul>
+                                <li>Run against local devstack (Temporal, Spanner, FlimFlam, EventMesh)</li>
+                                <li>Test complete workflow execution from payload creation to event publishing</li>
+                                <li>Use Ginkgo framework with Gomega assertions</li>
+                                <li>Validate database state, API calls, and published events</li>
+                                <li>Located in: <code>test-harness/suites/blackbox/</code></li>
+                            </ul>
+                            <br>
+                            <strong>Run tests:</strong>
+                            <pre>make test.integration.blackbox</pre>
+                        `
+                    },
+                    {
+                        question: "What is FlimFlam and how do I use it?",
+                        answer: `
+                            FlimFlam is a <strong>configurable HTTP mock server</strong> for downstream service integrations (OCV, ANGI, CAP-CIS).
+                            <br><br>
+                            <strong>Setting expectations:</strong>
+                            <pre>Iat.FlimFlam.SetExpectations(
+    expectations.SuccessfulOcvCustomerOnboardingExpectation(OCVID, capCisID),
+    expectations.SuccessfulOcvMaintainPartyExpectation(OCVID),
+    expectations.SuccessfulOcvMaintainPartyRelationshipExpectation(),
+)</pre>
+                            <br>
+                            <strong>Key points:</strong>
+                            <ul>
+                                <li>Each expectation defaults to <code>Count(1)</code> - one API call expected</li>
+                                <li>For multiple calls, duplicate the expectation instead of using WithCount</li>
+                                <li>FlimFlam returns <code>500 Internal Server Error</code> if no matching expectation exists</li>
+                                <li>Clear expectations between tests for isolation</li>
+                                <li>Check FlimFlam logs: <code>make devstack.logs.flimflam</code></li>
+                            </ul>
+                        `
+                    },
+                    {
+                        question: "How do I handle multiple API calls to the same endpoint?",
+                        answer: `
+                            <strong>Duplicate the expectation</strong> for each call instead of using a count parameter.
+                            <br><br>
+                            <strong>Example:</strong> 2 relationship payloads = 2 API calls
+                            <pre>Iat.FlimFlam.SetExpectations(
+    expectations.SuccessfulOcvMaintainPartyRelationshipExpectation(),
+    expectations.SuccessfulOcvMaintainPartyRelationshipExpectation(),  // Duplicate for 2nd call
+)</pre>
+                            <br>
+                            <strong>Why not WithCount?</strong>
+                            <ul>
+                                <li>Simpler approach - no need to modify shared expectation utilities</li>
+                                <li>More explicit - clearly shows how many calls are expected</li>
+                                <li>Easier to debug - each expectation is independent</li>
+                            </ul>
+                            <br>
+                            <strong>Error if insufficient expectations:</strong>
+                            <pre>500 Internal Server Error - No matching expectation found</pre>
+                        `
+                    },
+                    {
+                        question: "How do I verify events published by workflows?",
+                        answer: `
+                            Use the <strong>EventMesh consumer</strong> to retrieve events and verify their content.
+                            <br><br>
+                            <strong>Basic verification:</strong>
+                            <pre>consumer := Iat.EventMesh.Consumer(specContext, eventmesh.ConsumerParams{
+    WorkflowID: workflowID,
+})
+
+events := consumer.GetEvents()
+g.Expect(events).To(HaveLen(2))  // Expect 2 events</pre>
+                            <br>
+                            <strong>Verify event data:</strong>
+                            <pre>var eventData events.MigrationPhaseStarted
+err := json.Unmarshal(events[0].Data, &eventData)
+g.Expect(err).ToNot(HaveOccurred())
+g.Expect(eventData.Customers).To(ContainElement(suncorpID))</pre>
+                            <br>
+                            <strong>IMPORTANT:</strong> For incremental events (phase started), always get the <strong>LAST</strong> event of that type:
+                            <pre>// Iterate backwards to get most recent event
+events := consumer.GetEvents()
+for i := len(events) - 1; i >= 0; i-- {
+    if events[i].EventType == eventType {
+        // Use this event
+        break
+    }
+}</pre>
+                        `
+                    },
+                    {
+                        question: "Why should I get the LAST event instead of the first?",
+                        answer: `
+                            <strong>Incremental events</strong> like phase started are published multiple times as new customers are added.
+                            <br><br>
+                            <strong>Example scenario:</strong>
+                            <ul>
+                                <li>Phase starts with Customer A → publishes event with [Customer A]</li>
+                                <li>Customer B added during phase → publishes event with [Customer A, Customer B]</li>
+                            </ul>
+                            <br>
+                            Getting the <strong>first event</strong> only contains [Customer A]<br>
+                            Getting the <strong>last event</strong> contains [Customer A, Customer B]
+                            <br><br>
+                            <strong>Implementation:</strong>
+                            <pre>// WRONG - gets first event
+events := consumer.GetEvents()
+eventData := events[0]  // Only has initial customers
+
+// CORRECT - gets last event
+for i := len(events) - 1; i >= 0; i-- {
+    if events[i].EventType == targetEventType {
+        eventData := events[i]  // Has all customers
+        break
+    }
+}</pre>
+                            <br>
+                            <strong>Phase completed events</strong> are consolidated, so first/last doesn't matter.
+                        `
+                    },
+                    {
+                        question: "How do I ensure test isolation and clean state?",
+                        answer: `
+                            <strong>Clean up before tests run</strong> to remove stale payloads and ensure fresh database state.
+                            <br><br>
+                            <strong>Cleanup pattern:</strong>
+                            <pre>BeforeEach(func(specContext SpecContext) {
+    // Remove any existing payloads for this test's CustomerGroupID
+    Iat.Spanner.CleanupPayloads(specContext, customerGroupID)
+
+    // Create fresh test data
+    createTestPayloads(specContext)
+})</pre>
+                            <br>
+                            <strong>Key practices:</strong>
+                            <ul>
+                                <li>Use unique <code>CustomerGroupID</code> per test scenario</li>
+                                <li>Clean up at test START (BeforeEach), not end (AfterEach)</li>
+                                <li>Restart devstack for new feature testing: <code>make devstack.stop && make devstack.start</code></li>
+                                <li>Clear FlimFlam expectations between tests</li>
+                            </ul>
+                            <br>
+                            <strong>Why cleanup at start?</strong> Failed tests may not reach AfterEach, leaving dirty state. Cleaning at start guarantees fresh state regardless of previous test outcome.
+                        `
+                    },
+                    {
+                        question: "How do I create test payloads in Spanner?",
+                        answer: `
+                            Use <strong>Spanner expectations API</strong> for fluent, type-safe payload creation.
+                            <br><br>
+                            <strong>Example:</strong>
+                            <pre>Iat.Spanner.CreatePayloads(specContext, []spanner.PayloadExpectation{
+    {
+        CustomerGroupID: customerGroupID,
+        InterfaceName:   "OCVOnboarding",
+        SuncorpID:       "suncorpID-123",
+        Status:          "Schedulable",
+        Payload:         ocvPayloadJSON,
+    },
+    {
+        CustomerGroupID: customerGroupID,
+        InterfaceName:   "MaintainParty",
+        SuncorpID:       "suncorpID-123",
+        Status:          "Schedulable",
+        Payload:         maintainPartyPayloadJSON,
+    },
+})</pre>
+                            <br>
+                            <strong>Key fields:</strong>
+                            <ul>
+                                <li><code>CustomerGroupID</code> - Migration batch identifier (group payloads together)</li>
+                                <li><code>InterfaceName</code> - OCVOnboarding, MaintainParty, Relationship, etc.</li>
+                                <li><code>SuncorpID</code> - Customer identifier (can have multiple per group)</li>
+                                <li><code>Status</code> - Schedulable (ready), Scheduled, Processing, Completed</li>
+                                <li><code>Payload</code> - JSON payload data</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        question: "How do I verify payload status changes in Spanner?",
+                        answer: `
+                            Use <strong>Spanner query helpers</strong> to verify payload state transitions.
+                            <br><br>
+                            <strong>Verify status:</strong>
+                            <pre>// Verify all payloads completed
+payloads := Iat.Spanner.GetPayloads(specContext, customerGroupID)
+for _, p := range payloads {
+    g.Expect(p.Status).To(Equal("Completed"))
+}</pre>
+                            <br>
+                            <strong>Verify specific interface:</strong>
+                            <pre>ocvPayload := Iat.Spanner.GetPayload(specContext, customerGroupID, "OCVOnboarding", suncorpID)
+g.Expect(ocvPayload.Status).To(Equal("Processing"))</pre>
+                            <br>
+                            <strong>Status lifecycle:</strong>
+                            <ol>
+                                <li><code>Schedulable</code> - Initial state, ready for scheduler</li>
+                                <li><code>Scheduled</code> - Scheduler picked it up, starting workflow</li>
+                                <li><code>Processing</code> - Phase workflow executing</li>
+                                <li><code>Completed</code> - Phase finished successfully</li>
+                            </ol>
+                        `
+                    },
+                    {
+                        question: "What if my workflow gets stuck or doesn't progress?",
+                        answer: `
+                            <strong>Common causes and debugging steps:</strong>
+                            <br><br>
+                            <strong>1. Missing FlimFlam expectations</strong>
+                            <ul>
+                                <li>Symptom: Workflow stuck after activity, FlimFlam returns 500</li>
+                                <li>Fix: Ensure expectation count matches API call count</li>
+                                <li>Check: <code>make devstack.logs.flimflam</code></li>
+                            </ul>
+                            <br>
+                            <strong>2. Missing payloads (intentional infinite retry)</strong>
+                            <ul>
+                                <li>Symptom: Workflow retries forever waiting for payload</li>
+                                <li>Fix: Create missing MaintainParty/Relationship payloads</li>
+                                <li>Note: This is intentional for async payload arrival</li>
+                            </ul>
+                            <br>
+                            <strong>3. Workflow execution errors</strong>
+                            <ul>
+                                <li>Check Temporal UI: <code>http://localhost:8088</code></li>
+                                <li>Search by WorkflowID to see execution history</li>
+                                <li>Review activity failures and retry attempts</li>
+                            </ul>
+                            <br>
+                            <strong>4. Database state issues</strong>
+                            <ul>
+                                <li>Verify payloads exist: <code>Iat.Spanner.GetPayloads()</code></li>
+                                <li>Check payload status transitions</li>
+                                <li>Ensure CustomerGroupID matches between test and payloads</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        question: "How do I test asynchronous payload arrival?",
+                        answer: `
+                            Test workflows that <strong>wait for payloads</strong> to arrive after the workflow has started.
+                            <br><br>
+                            <strong>Scenario:</strong> Phase starts with OCVOnboarding, but MaintainParty arrives later
+                            <br><br>
+                            <strong>Test pattern:</strong>
+                            <pre>It("Should handle late-arriving payloads", func(specContext SpecContext) {
+    // 1. Create only OCVOnboarding payload
+    Iat.Spanner.CreatePayloads(specContext, []spanner.PayloadExpectation{
+        {InterfaceName: "OCVOnboarding", CustomerGroupID: groupID, ...},
+    })
+
+    // 2. Start workflow (will retry waiting for MaintainParty)
+    startScheduler(specContext, groupID)
+
+    // 3. Wait a bit to ensure workflow is retrying
+    time.Sleep(5 * time.Second)
+
+    // 4. Add missing payload
+    Iat.Spanner.CreatePayloads(specContext, []spanner.PayloadExpectation{
+        {InterfaceName: "MaintainParty", CustomerGroupID: groupID, ...},
+    })
+
+    // 5. Workflow should now complete
+    Eventually(func() string {
+        return Iat.Spanner.GetPayload(specContext, groupID, "MaintainParty", suncorpID).Status
+    }).Should(Equal("Completed"))
+})</pre>
+                            <br>
+                            <strong>Key insight:</strong> Infinite retry pattern is intentional for this business requirement.
+                        `
+                    },
+                    {
+                        question: "How do I structure a blackbox test?",
+                        answer: `
+                            Use <strong>Ginkgo BDD style</strong> with clear test organization and labels.
+                            <br><br>
+                            <strong>Test structure:</strong>
+                            <pre>var _ = Describe("Feature: Customer Profile Creation", LabelDeliverable(DeliverableCustomerProfile), func() {
+    When("All payloads exist", Label("ANZX-123456"), func() {
+        It("Should complete phase successfully", Label("SCN-CP-1"), func(specContext SpecContext) {
+            // 1. Setup: Create test data
+            customerGroupID := "test-group-001"
+            Iat.Spanner.CreatePayloads(specContext, testPayloads)
+
+            // 2. Configure: Set FlimFlam expectations
+            Iat.FlimFlam.SetExpectations(mockExpectations...)
+
+            // 3. Execute: Start workflow
+            workflowID := startScheduler(specContext, customerGroupID)
+
+            // 4. Assert: Verify outcomes
+            Eventually(func() string {
+                return getPayloadStatus(specContext, customerGroupID)
+            }).Should(Equal("Completed"))
+
+            // 5. Verify: Check events
+            events := Iat.EventMesh.Consumer(specContext, workflowID).GetEvents()
+            g.Expect(events).To(HaveLen(2))
+        })
+    })
+})</pre>
+                            <br>
+                            <strong>Required labels:</strong>
+                            <ul>
+                                <li><code>Label("ANZX-#####")</code> - Story ticket for X-Ray linking</li>
+                                <li><code>Label("SCN-XXX-#")</code> - Scenario number (maps to requirements)</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        question: "What debugging tools are available?",
+                        answer: `
+                            <strong>Key debugging tools:</strong>
+                            <br><br>
+                            <strong>1. Temporal UI</strong>
+                            <ul>
+                                <li>URL: <code>http://localhost:8088</code></li>
+                                <li>Search by WorkflowID to see execution history</li>
+                                <li>View activity retries, inputs, outputs, errors</li>
+                                <li>Inspect workflow state and event history</li>
+                            </ul>
+                            <br>
+                            <strong>2. FlimFlam logs</strong>
+                            <pre>make devstack.logs.flimflam</pre>
+                            <ul>
+                                <li>See incoming HTTP requests</li>
+                                <li>Verify expectations matched correctly</li>
+                                <li>Debug 500 errors (missing expectations)</li>
+                            </ul>
+                            <br>
+                            <strong>3. Component logs</strong>
+                            <pre>make devstack.logs.{component}</pre>
+                            <ul>
+                                <li>Available components: scheduler, dispatcher, fileingestion, etc.</li>
+                                <li>View structured logs with trace IDs</li>
+                            </ul>
+                            <br>
+                            <strong>4. Spanner database</strong>
+                            <ul>
+                                <li>Use <code>/spanner-db-access</code> skill for queries</li>
+                                <li>Inspect Payloads table for status transitions</li>
+                                <li>Verify CustomerGroupID and InterfaceName data</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        question: "How do I run blackbox tests?",
+                        answer: `
+                            <strong>Prerequisites:</strong>
+                            <ol>
+                                <li>Authenticate: <code>gcloud auth login</code></li>
+                                <li>Start devstack: <code>make devstack.start</code></li>
+                            </ol>
+                            <br>
+                            <strong>Run all blackbox tests:</strong>
+                            <pre>make test.integration.blackbox</pre>
+                            <br>
+                            <strong>Run specific test file:</strong>
+                            <pre>ginkgo -v test-harness/suites/blackbox/phaseworkflow_customercreation_test.go</pre>
+                            <br>
+                            <strong>Run specific scenario:</strong>
+                            <pre>ginkgo -v --focus="Should complete phase successfully" test-harness/suites/blackbox/</pre>
+                            <br>
+                            <strong>For new features - MUST reload devstack:</strong>
+                            <pre>make devstack.stop && make devstack.start</pre>
+                            <br>
+                            <strong>Common issues:</strong>
+                            <ul>
+                                <li>Not authenticated → <code>gcloud auth list --filter=status:ACTIVE</code></li>
+                                <li>Devstack not running → <code>make devstack.start</code></li>
+                                <li>Tests failing after code changes → restart devstack</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        question: "Which library does TMS use for API mocking in blackbox tests?",
+                        answer: `
+                            TMS uses <strong>FlimFlam</strong>, a custom-built HTTP mock server designed specifically for TMS blackbox testing.
+                            <br><br>
+                            <strong>What is FlimFlam?</strong>
+                            <ul>
+                                <li>HTTP server that runs in devstack as a Docker container</li>
+                                <li>Mocks downstream APIs: OCV (Customer Onboarding), ANGI (Account Numbers), CAP-CIS (Core Banking)</li>
+                                <li>Configurable via expectations API in test code</li>
+                                <li>Validates request matching and tracks call counts</li>
+                                <li>Located: <code>modules/testing-tools/suncorpflimflam/</code></li>
+                            </ul>
+                            <br>
+                            <strong>Why FlimFlam instead of standard mocking libraries?</strong>
+                            <ul>
+                                <li>Blackbox tests run workflows in separate processes (can't use in-process mocks)</li>
+                                <li>Needs to mock external HTTP APIs (OCV, ANGI, CAP-CIS)</li>
+                                <li>Provides realistic integration testing with actual HTTP calls</li>
+                                <li>Centralized mock management across all test scenarios</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        question: "Why do we need to set mocks in blackbox tests?",
+                        answer: `
+                            <strong>Mocks isolate tests from external dependencies</strong> and provide controlled, predictable responses.
+                            <br><br>
+                            <strong>Key reasons:</strong>
+                            <ul>
+                                <li><strong>Isolation</strong>: Tests don't depend on external systems (OCV, ANGI, CAP-CIS) being available</li>
+                                <li><strong>Speed</strong>: Mock responses are instant (no network latency or real processing)</li>
+                                <li><strong>Control</strong>: Simulate specific scenarios (success, errors, edge cases) on demand</li>
+                                <li><strong>Repeatability</strong>: Same mock setup produces same results every time</li>
+                                <li><strong>Safety</strong>: No risk of corrupting real systems or production data</li>
+                            </ul>
+                            <br>
+                            <strong>Without mocks:</strong>
+                            <ul>
+                                <li>Tests would fail if OCV/ANGI/CAP-CIS are down or unreachable</li>
+                                <li>Can't test error scenarios (4xx, 5xx responses) without breaking real systems</li>
+                                <li>Tests would be slow (waiting for real API responses)</li>
+                                <li>Risk of creating duplicate customers or corrupting test data</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        question: "How do I update mock response based on the request?",
+                        answer: `
+                            FlimFlam expectations support <strong>dynamic responses</strong> based on request matching.
+                            <br><br>
+                            <strong>Basic expectation (fixed response):</strong>
+                            <pre>expectations.SuccessfulOcvCustomerOnboardingExpectation(OCVID, capCisID)</pre>
+                            <br>
+                            <strong>Custom response based on request:</strong>
+                            <pre>flimflam.Expectation{
+    Path:   "/ocv/api/v1/customer/onboarding",
+    Method: "POST",
+    Response: flimflam.Response{
+        StatusCode: 200,
+        Body: func(req *http.Request) []byte {
+            // Parse request to determine response
+            var reqBody OCVRequest
+            json.NewDecoder(req.Body).Decode(&reqBody)
+
+            // Return different response based on request
+            if reqBody.CustomerType == "INDIVIDUAL" {
+                return []byte(\`{"OCVID": "12345", "Status": "Active"}\`)
+            }
+            return []byte(\`{"OCVID": "67890", "Status": "Pending"}\`)
+        },
+    },
+}</pre>
+                            <br>
+                            <strong>Common patterns:</strong>
+                            <ul>
+                                <li>Extract ID from request URL and echo it in response</li>
+                                <li>Return different status codes based on request payload</li>
+                                <li>Simulate errors for specific customer types or scenarios</li>
+                            </ul>
+                        `
+                    },
+                    {
+                        question: "How do I assert that the request body contains specific values?",
+                        answer: `
+                            Use FlimFlam's <strong>request matchers</strong> to validate request body content.
+                            <br><br>
+                            <strong>Basic body matching:</strong>
+                            <pre>flimflam.Expectation{
+    Path:   "/ocv/api/v1/maintain-party",
+    Method: "POST",
+    RequestMatchers: []flimflam.RequestMatcher{
+        flimflam.BodyContains("suncorpID-123"),
+        flimflam.BodyContains("CustomerType"),
+    },
+    Response: flimflam.Response{StatusCode: 200},
+}</pre>
+                            <br>
+                            <strong>JSON field matching:</strong>
+                            <pre>flimflam.Expectation{
+    Path:   "/api/customer",
+    Method: "POST",
+    RequestMatchers: []flimflam.RequestMatcher{
+        flimflam.JSONFieldEquals("customer.suncorpID", "suncorpID-123"),
+        flimflam.JSONFieldEquals("customer.status", "Active"),
+    },
+    Response: flimflam.Response{StatusCode: 200},
+}</pre>
+                            <br>
+                            <strong>Custom validation:</strong>
+                            <pre>flimflam.RequestMatcher(func(req *http.Request) error {
+    var body map[string]interface{}
+    json.NewDecoder(req.Body).Decode(&body)
+
+    if body["OCVID"] != "expected-value" {
+        return fmt.Errorf("OCVID mismatch: got %v", body["OCVID"])
+    }
+    return nil
+})</pre>
+                            <br>
+                            <strong>Note:</strong> If request doesn't match, FlimFlam returns <code>500 Internal Server Error</code>.
+                        `
+                    },
+                    {
+                        question: "How do I assert that request headers contain specific values?",
+                        answer: `
+                            Use FlimFlam's <strong>header matchers</strong> to validate HTTP headers.
+                            <br><br>
+                            <strong>Header matching:</strong>
+                            <pre>flimflam.Expectation{
+    Path:   "/api/customer",
+    Method: "POST",
+    RequestMatchers: []flimflam.RequestMatcher{
+        flimflam.HeaderEquals("Content-Type", "application/json"),
+        flimflam.HeaderEquals("X-Correlation-ID", "test-correlation-id"),
+        flimflam.HeaderContains("Authorization", "Bearer"),
+    },
+    Response: flimflam.Response{StatusCode: 200},
+}</pre>
+                            <br>
+                            <strong>Multiple header assertions:</strong>
+                            <pre>flimflam.Expectation{
+    RequestMatchers: []flimflam.RequestMatcher{
+        flimflam.HeaderEquals("X-Request-ID", "req-123"),
+        flimflam.HeaderEquals("X-Tenant-ID", "suncorp"),
+        flimflam.HeaderContains("User-Agent", "TMS"),
+    },
+}</pre>
+                            <br>
+                            <strong>Custom header validation:</strong>
+                            <pre>flimflam.RequestMatcher(func(req *http.Request) error {
+    authHeader := req.Header.Get("Authorization")
+    if !strings.HasPrefix(authHeader, "Bearer ") {
+        return fmt.Errorf("invalid auth header: %s", authHeader)
+    }
+    return nil
+})</pre>
+                        `
+                    },
+                    {
+                        question: "How do I ensure all mocks in a test have been called?",
+                        answer: `
+                            FlimFlam <strong>automatically verifies</strong> that all expectations were met during test execution.
+                            <br><br>
+                            <strong>Automatic verification:</strong>
+                            <ul>
+                                <li>Each expectation has a default <code>Count(1)</code></li>
+                                <li>FlimFlam tracks how many times each expectation was called</li>
+                                <li>Test framework verifies counts match expectations</li>
+                                <li>If an expectation isn't called, test fails with clear error message</li>
+                            </ul>
+                            <br>
+                            <strong>Example:</strong>
+                            <pre>// Set 3 expectations
+Iat.FlimFlam.SetExpectations(
+    expectations.SuccessfulOcvCustomerOnboardingExpectation(...),  // Count(1)
+    expectations.SuccessfulOcvMaintainPartyExpectation(...),        // Count(1)
+    expectations.SuccessfulOcvMaintainPartyRelationshipExpectation(), // Count(1)
+)
+
+// If only 2 API calls happen, test fails:
+// "Expectation not met: SuccessfulOcvMaintainPartyRelationshipExpectation called 0 times, expected 1"</pre>
+                            <br>
+                            <strong>For multiple calls to same endpoint:</strong>
+                            <pre>// Duplicate expectation for each call
+Iat.FlimFlam.SetExpectations(
+    expectations.SuccessfulOcvMaintainPartyRelationshipExpectation(),
+    expectations.SuccessfulOcvMaintainPartyRelationshipExpectation(),  // 2nd call
+)</pre>
+                            <br>
+                            <strong>Manual verification (if needed):</strong>
+                            <pre>// Check FlimFlam logs
+make devstack.logs.flimflam
+
+// Look for: "Expectation matched: <expectation-name> (1/1 calls)"</pre>
+                        `
+                    },
+                    {
+                        question: "Are mocks set in one test accessible in other tests?",
+                        answer: `
+                            <strong>No, mocks are NOT shared between tests.</strong> Each test must set its own expectations.
+                            <br><br>
+                            <strong>Test isolation pattern:</strong>
+                            <pre>Describe("Customer Profile Tests", func() {
+    It("Test 1: Create customer", func(specContext SpecContext) {
+        // Set expectations ONLY for this test
+        Iat.FlimFlam.SetExpectations(
+            expectations.SuccessfulOcvCustomerOnboardingExpectation(...),
+        )
+        // Test runs with these expectations
+    })
+
+    It("Test 2: Update customer", func(specContext SpecContext) {
+        // Must set NEW expectations for this test
+        Iat.FlimFlam.SetExpectations(
+            expectations.SuccessfulOcvMaintainPartyExpectation(...),
+        )
+        // Previous test's expectations are NOT available here
+    })
+})</pre>
+                            <br>
+                            <strong>Why isolation matters:</strong>
+                            <ul>
+                                <li><strong>Prevents test interference</strong>: Tests can run in any order</li>
+                                <li><strong>Clear test intent</strong>: Each test explicitly declares its dependencies</li>
+                                <li><strong>Parallel execution</strong>: Tests don't share state, can run concurrently</li>
+                                <li><strong>Easier debugging</strong>: Each test is self-contained</li>
+                            </ul>
+                            <br>
+                            <strong>Best practice:</strong>
+                            <pre>BeforeEach(func(specContext SpecContext) {
+    // Clear FlimFlam expectations before each test
+    Iat.FlimFlam.ClearExpectations()
+
+    // Set fresh expectations for this test
+    Iat.FlimFlam.SetExpectations(...)
+})</pre>
+                        `
+                    },
+                    {
+                        question: "How does FlimFlam mock server run during tests?",
+                        answer: `
+                            FlimFlam runs as a <strong>Docker container in devstack</strong>, acting as a real HTTP server.
+                            <br><br>
+                            <strong>Architecture:</strong>
+                            <ol>
+                                <li><strong>Devstack starts FlimFlam</strong> container: <code>make devstack.start</code></li>
+                                <li><strong>Container listens</strong> on configured port (exposed to localhost)</li>
+                                <li><strong>TMS workflows</strong> make HTTP calls to FlimFlam instead of real OCV/ANGI/CAP-CIS</li>
+                                <li><strong>FlimFlam matches requests</strong> against configured expectations</li>
+                                <li><strong>Returns mock response</strong> or 500 if no expectation matches</li>
+                            </ol>
+                            <br>
+                            <strong>Configuration flow:</strong>
+                            <pre>Test Code (Go)
+    ↓
+Iat.FlimFlam.SetExpectations(...)  [HTTP API call to FlimFlam]
+    ↓
+FlimFlam Container stores expectations
+    ↓
+TMS Workflow makes API call → FlimFlam
+    ↓
+FlimFlam matches request to expectation → Returns mock response
+    ↓
+Workflow continues with mock data</pre>
+                            <br>
+                            <strong>Environment setup:</strong>
+                            <ul>
+                                <li><strong>Container name</strong>: <code>devstack-dep_flimflam</code></li>
+                                <li><strong>Logs</strong>: <code>make devstack.logs.flimflam</code></li>
+                                <li><strong>Configuration</strong>: TMS services point to FlimFlam URLs in devstack config</li>
+                                <li><strong>Lifecycle</strong>: Starts with devstack, stops when devstack stops</li>
+                            </ul>
+                            <br>
+                            <strong>How to verify it's running:</strong>
+                            <pre>docker ps | grep flimflam
+# Should show: devstack-dep_flimflam (running)</pre>
+                        `
+                    }
+                ]
+            }
+        ];
+
+        function renderContent(filteredFeatures = features) {
+            const content = document.getElementById('content');
+            const noResults = document.getElementById('noResults');
+
+            if (!filteredFeatures || filteredFeatures.length === 0) {
+                content.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            noResults.style.display = 'none';
+
+            let html = '';
+
+            filteredFeatures.forEach(feature => {
+                // Overview section
+                if (feature.overview) {
+                    html += `<div class="overview">
+                        <h2>${feature.overview.title}</h2>
+                        ${feature.overview.content.map(p => `<p>${p}</p>`).join('')}
+                    </div>`;
+                }
+
+                // Q&A section
+                html += '<div class="qna-list">';
+                feature.qna.forEach((item, index) => {
+                    html += `
+                        <div class="qna-item" data-index="${index}">
+                            <div class="question">
+                                <span>${item.question}</span>
+                                <span class="toggle-icon">▼</span>
+                            </div>
+                            <div class="answer">${item.answer}</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            });
+
+            content.innerHTML = html;
+
+            // Add click handlers
+            document.querySelectorAll('.question').forEach(q => {
+                q.addEventListener('click', function() {
+                    this.parentElement.classList.toggle('open');
+                });
+            });
+        }
+
+        function searchQuestions() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            if (!searchTerm) {
+                renderContent(features);
+                return;
+            }
+
+            const filtered = features.map(feature => {
+                const matchedQna = feature.qna.filter(item =>
+                    item.question.toLowerCase().includes(searchTerm) ||
+                    item.answer.toLowerCase().includes(searchTerm)
+                );
+
+                if (matchedQna.length > 0) {
+                    return { ...feature, qna: matchedQna };
+                }
+                return null;
+            }).filter(f => f !== null);
+
+            renderContent(filtered);
+        }
+
+        // Initialize
+        renderContent();
+
+        // Search with debounce
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(searchQuestions, 300);
+        });
+    </script>
+</body>
+</html>
